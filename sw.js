@@ -3,7 +3,7 @@
  * Cache-first app shell for offline use.
  */
 
-var CACHE_NAME = 'control-obra-v1';
+var CACHE_NAME = 'control-obra-v2';
 
 var APP_SHELL = [
   './',

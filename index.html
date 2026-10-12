@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Control Financiero de Obra</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+      colors: {
+        pending: '#f59e0b',
+        paid: '#10b981',
+        overdue: '#ef4444',
+      },
+        },
+      },
+    };
+  </script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    :root {
+      --bg: #f9fafb; --surface: #ffffff; --surface2: #f3f4f6;
+      --text: #111827; --text2: #374151; --text3: #6b7280; --text4: #9ca3af;
+      --border: #e5e7eb; --border2: #d1d5db;
+    }
+    .dark {
+      --bg: #0f172a; --surface: #1e293b; --surface2: #334155;
+      --text: #f1f5f9; --text2: #cbd5e1; --text3: #94a3b8; --text4: #64748b;
+      --border: #334155; --border2: #475569;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; background: var(--bg); color: var(--text); transition: background 0.2s, color 0.2s; }
+    input, select, button, textarea { font-family: inherit; }
+    .card-shadow { box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); }
+    .dark .card-shadow { box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2); }
+    .card-shadow-hover:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .tab-active { box-shadow: 0 2px 8px rgba(37,99,235,0.15); }
+    .fade-in { animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+    .slide-up { animation: slideUp 0.25s ease; }
+    @keyframes slideUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    ::-webkit-scrollbar { height: 4px; width: 4px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+      .dark ::-webkit-scrollbar-thumb { background: #475569; }
+      /* Dark mode card overrides */
+      .dark .bg-blue-50 { background: rgba(30,58,138,0.25) !important; border-color: rgba(59,130,246,0.3) !important; }
+      .dark .bg-indigo-50 { background: rgba(49,46,129,0.25) !important; border-color: rgba(99,102,241,0.3) !important; }
+      .dark .bg-gray-100 { background: var(--surface2) !important; border-color: var(--border) !important; }
+      .dark .bg-emerald-50 { background: rgba(6,95,70,0.25) !important; border-color: rgba(16,185,129,0.3) !important; }
+      .dark .bg-amber-50 { background: rgba(120,53,15,0.25) !important; border-color: rgba(245,158,11,0.3) !important; }
+      .dark .bg-rose-50 { background: rgba(136,19,55,0.25) !important; border-color: rgba(244,63,94,0.3) !important; }
+      .dark .bg-purple-50 { background: rgba(88,28,135,0.25) !important; border-color: rgba(168,85,247,0.3) !important; }
+      .dark .bg-red-50 { background: rgba(127,29,29,0.25) !important; border-color: rgba(239,68,68,0.3) !important; }
+      .dark .bg-green-50 { background: rgba(20,83,45,0.25) !important; border-color: rgba(34,197,94,0.3) !important; }
+      .dark .bg-blue-50\/50 { background: rgba(30,58,138,0.15) !important; }
+      .dark .bg-blue-50\/30 { background: rgba(30,58,138,0.1) !important; }
+      .dark .bg-gray-50\/50 { background: rgba(51,65,85,0.3) !important; }
+      .dark .bg-gray-50\/40 { background: rgba(51,65,85,0.2) !important; }
+      .dark .bg-purple-50\/40 { background: rgba(88,28,135,0.15) !important; }
+      .dark .bg-rose-50\/40 { background: rgba(136,19,55,0.15) !important; }
+      /* Dark mode text overrides */
+      .dark .text-gray-900 { color: var(--text) !important; }
+      .dark .text-gray-800 { color: var(--text) !important; }
+      .dark .text-gray-700 { color: var(--text2) !important; }
+      .dark .text-gray-600 { color: var(--text2) !important; }
+      .dark .text-gray-500 { color: var(--text3) !important; }
+      .dark .text-gray-400 { color: var(--text4) !important; }
+      .dark .text-gray-300 { color: var(--text4) !important; }
+      .dark .bg-gray-50 { background: var(--surface2) !important; }
+      .dark .bg-gray-100 { background: var(--surface2) !important; border-color: var(--border) !important; }
+      .dark .border-gray-100 { border-color: var(--border) !important; }
+      .dark .border-gray-200 { border-color: var(--border) !important; }
+      .dark .border-gray-300 { border-color: var(--border2) !important; }
+      .dark .border-t { border-color: var(--border) !important; }
+      .dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]) { border-color: var(--border) !important; }
+      .dark .ring-blue-400 { --tw-ring-color: rgba(96,165,250,0.5) !important; }
+      /* Dark mode surface overrides */
+      .dark .bg-white { background: var(--surface) !important; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased">
+
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // ─── Helpers ────────────────────────────────────────────────
+    const toNum = (v) => { const n = Number(v); return isNaN(n) ? 0 : n; };
+    let _id = Date.now();
+    const uid = () => ++_id;
+
+    const fmt = (n) => {
+      const num = toNum(n);
+      return '$' + num.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    };
+
+    const today = () => new Date().toISOString().split('T')[0];
+
+    // ─── Print Helper ──────────────────────────────────────────
+    function imprimirSeccion(titulo, contenidoHTML) {
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+          <meta charset="UTF-8">
+          <title>${titulo} - Control de Obra</title>
+          <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; padding: 20px; color: #1f2937; }
+            h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+            .subtitle { font-size: 11px; color: #6b7280; margin-bottom: 16px; }
+            table { width: 100%; border-collapse: collapse; font-size: 12px; }
+            th { background: #f3f4f6; padding: 8px 10px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; border-bottom: 2px solid #e5e7eb; }
+            td { padding: 8px 10px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+            .text-right { text-align: right; }
+            .text-center { text-align: center; }
+            .font-medium { font-weight: 500; }
+            .font-bold { font-weight: 700; }
+            .text-xs { font-size: 10px; }
+            .text-gray-400 { color: #9ca3af; }
+            .text-gray-500 { color: #6b7280; }
+            .text-amber-600 { color: #d97706; }
+            .text-purple-600 { color: #9333ea; }
+            .text-rose-600 { color: #e11d48; }
+            .text-emerald-600 { color: #059669; }
+            .badge-purple { display: inline-block; font-size: 10px; font-weight: 700; color: #9333ea; background: #faf5ff; padding: 2px 6px; border-radius: 4px; border: 1px solid #e9d5ff; margin-top: 3px; }
+            .badge-rose { display: inline-block; font-size: 10px; font-weight: 700; color: #e11d48; background: #fff1f2; padding: 2px 6px; border-radius: 4px; border: 1px solid #fecdd3; margin-top: 3px; }
+            .badge-amber { display: inline-block; font-size: 10px; font-weight: 600; color: #92400e; background: #fffbeb; padding: 2px 6px; border-radius: 4px; border: 1px solid #fde68a; }
+            .badge-emerald { display: inline-block; font-size: 10px; font-weight: 600; color: #065f46; background: #ecfdf5; padding: 2px 6px; border-radius: 4px; border: 1px solid #a7f3d0; }
+            .badge-gray { display: inline-block; font-size: 10px; color: #6b7280; background: #f3f4f6; padding: 2px 6px; border-radius: 4px; }
+            .footer { margin-top: 12px; padding-top: 8px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #6b7280; display: flex; flex-wrap: wrap; gap: 12px; }
+            .footer strong { color: #111827; }
+            .card-item { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+            .card-item .info { flex: 1; }
+            .card-item .meta { font-size: 11px; color: #9ca3af; display: flex; gap: 6px; align-items: center; margin-bottom: 4px; }
+            .card-item .name { font-weight: 500; font-size: 13px; }
+            .card-item .amount { font-size: 16px; font-weight: 700; }
+            @media print {
+              body { padding: 10px; }
+              .no-print { display: none !important; }
+            }
+          </style>
+        </head>
+        <body>
+          <h1>${titulo}</h1>
+          <p class="subtitle">Control Financiero de Obra — ${new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          ${contenidoHTML}
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+      setTimeout(() => printWindow.print(), 300);
+    }
+
+    function calcularEncadenado(tareas, adelantos) {
+      const ordenadas = [...tareas].sort((a, b) => {
+        const idA = toNum(a.id);
+        const idB = toNum(b.id);
+        if (idA < idB) return -1;
+        if (idA > idB) return 1;
+        return 0;
+      });
+      let descuento = 0;
+      let descSource = null;
+      const resultado = [];
+      for (const t of ordenadas) {
+        const presupuestoOrig = toNum(t.presupuesto);
+        const adsDirectos = adelantos
+          .filter(a => toNum(a.tareaId) === toNum(t.id))
+          .reduce((s, a) => s + toNum(a.monto), 0);
+        const descuentoAntes = descuento;
+        const sourceAntes = descSource;
+        const presupuestoAjustado = Math.max(0, presupuestoOrig - descuento);
+        const descRestante = Math.max(0, descuento - presupuestoOrig);
+        if (adsDirectos >= presupuestoAjustado) {
+          const exceso = adsDirectos - presupuestoAjustado;
+          resultado.push({ ...t, presupuestoOrig, adsDirectos, descuentoAntes, sourceAntes, presupuestoAjustado, exceso, saldo: 0 });
+          descuento = exceso + descRestante;
+          descSource = t.tarea;
+        } else {
+          resultado.push({ ...t, presupuestoOrig, adsDirectos, descuentoAntes, sourceAntes, presupuestoAjustado, exceso: 0, saldo: presupuestoAjustado - adsDirectos });
+          descuento = descRestante;
+        }
+      }
+      return { encadenado: resultado, descuentoFinal: descuento };
+    }
+
+    const ESTADOS = ['No Iniciado', 'En Proceso', 'Terminado'];
+    const METODOS = ['Efectivo', 'Transferencia', 'Cheque', 'Depósito', 'Otro'];
+
+    // ─── Cuotas auto-calculadas (día 7 de cada mes) ──────────────
+    function cuotasPagadasAuto(m) {
+      if (m.tipoPago !== 'Cuotas' || !m.cantidadCuotas || !m.fechaCompra) return 0;
+      const fechaBase = new Date(m.fechaCompra + 'T12:00:00');
+      const hoy = new Date();
+      let pagadas = 0;
+      for (let i = 0; i < m.cantidadCuotas; i++) {
+        const vencimiento = new Date(fechaBase.getFullYear(), fechaBase.getMonth() + 1 + i, 7);
+        if (hoy > vencimiento) pagadas++;
+        else break;
+      }
+      return pagadas;
+    }
+
+    // ─── IndexedDB helpers ─────────────────────────────────────
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open('ObraFinancieraDB', 1);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains('kv')) db.createObjectStore('kv');
+        };
+        req.onsuccess = (e) => resolve(e.target.result);
+        req.onerror = () => reject(req);
+      });
+    }
+
+    async function idbGet(key) {
+      try {
+        const db = await openDB();
+        return await new Promise((resolve, reject) => {
+          const tx = db.transaction('kv', 'readonly');
+          const req = tx.objectStore('kv').get(key);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req);
+        });
+      } catch { return undefined; }
+    }
+
+    async function idbSet(key, val) {
+      try {
+        const db = await openDB();
+        await new Promise((resolve, reject) => {
+          const tx = db.transaction('kv', 'readwrite');
+          tx.objectStore('kv').put(val, key);
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx);
+        });
+      } catch {}
+    }
+
+    // ─── Custom Hook (IndexedDB + localStorage) ─────────────────
+    function usePersist(key, initial) {
+      const [val, setVal] = useState(() => {
+        try {
+          const raw = localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : initial;
+        } catch { return initial; }
+      });
+
+      useEffect(() => {
+        let cancel = false;
+        (async () => {
+          const stored = await idbGet(key);
+          if (stored !== undefined && !cancel) {
+            setVal(stored);
+            try { localStorage.setItem(key, JSON.stringify(stored)); } catch {}
+          }
+        })();
+        return () => { cancel = true; };
+      }, [key]);
+
+      useEffect(() => {
+        idbSet(key, val);
+        try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+      }, [key, val]);
+
+      return [val, setVal];
+    }
+
+    // ─── Tablero ────────────────────────────────────────────────
+    function Tablero({ materiales, tareas, adelantos }) {
+      const totalMateriales = materiales.reduce((s, m) => {
+        if (m.tipoPago === 'Contado') return s + toNum(m.totalContado);
+        return s + (toNum(m.valorCuota) * toNum(m.cantidadCuotas));
+      }, 0);
+
+      const totalManoObra = tareas.reduce((s, t) => s + toNum(t.presupuesto), 0);
+      const totalComprometido = totalMateriales + totalManoObra;
+
+      const pagadoMateriales = materiales.reduce((s, m) => {
+        if (m.tipoPago === 'Contado') return s + toNum(m.totalContado);
+        return s + (toNum(m.valorCuota) * cuotasPagadasAuto(m));
+      }, 0);
+
+      const totalAdelantos = adelantos.reduce((s, a) => s + toNum(a.monto), 0);
+      const totalPagado = pagadoMateriales + totalAdelantos;
+
+      const enc = tareas.length > 0 ? calcularEncadenado(tareas, adelantos) : null;
+      const totalSaldoManoObra = enc ? enc.encadenado.reduce((s, e) => s + e.saldo, 0) : 0;
+      const descuentoFinal = enc ? enc.descuentoFinal : 0;
+      const tareaExcedente = enc ? enc.encadenado.find(e => e.exceso > 0) : null;
+
+      const saldoMateriales = Math.max(0, totalMateriales - pagadoMateriales);
+
+      const cards = [
+        { label: 'Total Invertido en Materiales', value: totalMateriales, color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200' },
+        { label: 'Total Contratado Mano de Obra', value: totalManoObra, color: 'text-indigo-700', bg: 'bg-indigo-50 border-indigo-200' },
+        { label: 'Presupuesto Total Comprometido', value: totalComprometido, color: 'text-gray-900', bg: 'bg-gray-100 border-gray-300' },
+        { label: 'Total Ya Pagado', value: totalPagado, color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
+        { label: 'Saldo Pendiente Materiales', value: saldoMateriales, color: 'text-amber-700', bg: 'bg-amber-50 border-amber-200' },
+        { label: 'Saldo Pendiente Mano de Obra', value: totalSaldoManoObra, color: 'text-rose-700', bg: 'bg-rose-50 border-rose-200' },
+      ];
+
+      return (
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4 fade-in">
+          {cards.map((c, i) => (
+            <div key={i} className={`${c.bg} border rounded-xl p-4 md:p-5 card-shadow`}>
+              <p className="text-xs md:text-sm font-medium uppercase tracking-wide mb-1" style={{color:'var(--text3)'}}>{c.label}</p>
+              <p className={`text-xl md:text-2xl lg:text-3xl font-bold ${c.color} tabular-nums`}>{fmt(c.value)}</p>
+            </div>
+          ))}
+          {(tareaExcedente || descuentoFinal > 0) && (
+            <div className="sm:col-span-2 xl:col-span-3 bg-purple-50 border border-purple-200 rounded-xl p-4 md:p-5 card-shadow">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <span className="text-sm font-medium" style={{color:'var(--text2)'}}>
+                  {descuentoFinal > 0
+                    ? `Descuento pendiente: ${fmt(descuentoFinal)}`
+                    : `Excedente de «${tareaExcedente.tarea}» → descuenta del siguiente presupuesto`}
+                </span>
+                <span className="text-2xl md:text-3xl font-bold text-purple-700 tabular-nums">
+                  {tareaExcedente ? fmt(tareaExcedente.exceso) : fmt(descuentoFinal)}
+                </span>
+              </div>
+              <p className="text-xs text-gray-400 mt-1">
+                {tareaExcedente
+                  ? `Los adelantos de «${tareaExcedente.tarea}» excedieron su presupuesto en ${fmt(tareaExcedente.exceso)}. Ese excedente descuenta del presupuesto de la siguiente tarea.`
+                  : 'Descuento pendiente para próximas tareas'}
+              </p>
+            </div>
+          )}
+          {totalComprometido > 0 && (() => {
+            const saldoPendiente = saldoMateriales + totalSaldoManoObra;
+            const pagado = totalComprometido - saldoPendiente;
+            return (
+              <div className={`sm:col-span-2 xl:col-span-3 rounded-xl p-4 md:p-5 border card-shadow ${saldoPendiente === 0 ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}`}>
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <span className="text-sm font-medium text-gray-600">
+                    {saldoPendiente === 0 ? 'Todo pagado' : 'Por pagar'}
+                  </span>
+                  <span className={`text-2xl md:text-3xl font-bold tabular-nums ${saldoPendiente === 0 ? 'text-emerald-700' : 'text-amber-700'}`}>
+                    {fmt(saldoPendiente)}
+                  </span>
+                </div>
+                <div className="mt-2 w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${saldoPendiente === 0 ? 'bg-emerald-500' : 'bg-amber-400'}`}
+                    style={{ width: `${totalComprometido > 0 ? Math.min(100, (pagado / totalComprometido) * 100) : 0}%` }}
+                  />
+                </div>
+                <p className="text-xs text-gray-400 mt-1">{fmt(pagado)} pagado de {fmt(totalComprometido)}</p>
+              </div>
+            );
+          })()}
+        </div>
+      );
+    }
+
+    // ─── Materiales ─────────────────────────────────────────────
+    function Materiales({ materiales, setMateriales }) {
+      const [form, setForm] = useState({
+        material: '', descripcion: '', proveedor: '', cantidad: '', tipoPago: 'Contado',
+        totalContado: '', valorCuota: '', cantidadCuotas: '',
+        fechaCompra: today(),
+      });
+      const [editId, setEditId] = useState(null);
+      const [err, setErr] = useState('');
+      const formRef = useRef(null);
+
+      const handle = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+      const startEdit = (m) => {
+        setEditId(m.id);
+        setForm({
+          material: m.material,
+          descripcion: m.descripcion || '',
+          proveedor: m.proveedor,
+          cantidad: String(m.cantidad),
+          tipoPago: m.tipoPago,
+          totalContado: String(m.totalContado || ''),
+          valorCuota: String(m.valorCuota || ''),
+          cantidadCuotas: String(m.cantidadCuotas || ''),
+          fechaCompra: m.fechaCompra || today(),
+        });
+        setErr('');
+        formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      };
+
+      const cancelEdit = () => {
+        setEditId(null);
+        setForm({ material: '', descripcion: '', proveedor: '', cantidad: '', tipoPago: 'Contado',
+          totalContado: '', valorCuota: '', cantidadCuotas: '', fechaCompra: today() });
+        setErr('');
+      };
+
+      const submit = (e) => {
+        e.preventDefault();
+        setErr('');
+        if (!form.material.trim()) {
+          setErr('Completa al menos el nombre del Material'); return;
+        }
+        const data = {
+          material: form.material.trim(),
+          descripcion: form.descripcion.trim(),
+          proveedor: form.proveedor.trim(),
+          cantidad: toNum(form.cantidad),
+          tipoPago: form.tipoPago,
+          totalContado: toNum(form.totalContado),
+          valorCuota: toNum(form.valorCuota),
+          cantidadCuotas: toNum(form.cantidadCuotas),
+          fechaCompra: form.fechaCompra || today(),
+        };
+        if (data.tipoPago === 'Cuotas' && data.cantidadCuotas <= 0) {
+          setErr('Indica la cantidad de cuotas'); return;
+        }
+        if (editId) {
+          setMateriales(materiales.map(m => m.id === editId ? { ...m, ...data } : m));
+          cancelEdit();
+        } else {
+          setMateriales([{ id: uid(), ...data }, ...materiales]);
+          setForm({ material: '', descripcion: '', proveedor: '', cantidad: '', tipoPago: 'Contado',
+            totalContado: '', valorCuota: '', cantidadCuotas: '', fechaCompra: today() });
+        }
+      };
+
+      const remove = (id) => setMateriales(materiales.filter(m => m.id !== id));
+
+      const totalGastado = (m) => {
+        if (m.tipoPago === 'Contado') return toNum(m.totalContado);
+        return toNum(m.valorCuota) * toNum(m.cantidadCuotas);
+      };
+
+      const saldoCuotas = (m) => {
+        if (m.tipoPago === 'Contado') return 0;
+        const pagadas = cuotasPagadasAuto(m);
+        return (toNum(m.valorCuota) * toNum(m.cantidadCuotas)) - (toNum(m.valorCuota) * pagadas);
+      };
+
+      const mesesCuota = (m) => {
+        if (m.tipoPago !== 'Cuotas' || !m.cantidadCuotas) return [];
+        const pagadas = cuotasPagadasAuto(m);
+        const fechaBase = m.fechaCompra || today();
+        const date = new Date(fechaBase + 'T12:00:00');
+        const meses = [];
+        for (let i = 0; i < m.cantidadCuotas; i++) {
+          const d = new Date(date.getFullYear(), date.getMonth() + 1 + i, 1);
+          const nombre = d.toLocaleDateString('es-ES', { month: 'short' });
+          meses.push({ nombre, pagada: i < pagadas });
+        }
+        return meses;
+      };
+
+      return (
+        <div className="fade-in space-y-4">
+          <form ref={formRef} onSubmit={submit} className={`bg-white rounded-xl p-4 md:p-5 border card-shadow space-y-3 ${editId ? 'ring-2 ring-blue-400' : ''}`}>
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-gray-700 text-sm md:text-base">
+                {editId ? 'Editando Material' : 'Registrar Material'}
+              </h3>
+              {editId && (
+                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full font-medium">
+                  ID: {editId}
+                </span>
+              )}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <input name="material" placeholder="Material (ej: Chapa de zinc)" value={form.material} onChange={handle}
+                className="input" />
+              <input name="descripcion" placeholder="Descripción (ej: 6 chapas de 6m)" value={form.descripcion} onChange={handle}
+                className="input" />
+              <input name="proveedor" placeholder="Proveedor" value={form.proveedor} onChange={handle}
+                className="input" />
+              <input name="cantidad" type="number" min="0" step="1" placeholder="Cantidad" value={form.cantidad} onChange={handle}
+                className="input" />
+              <select name="tipoPago" value={form.tipoPago} onChange={handle}
+                className="input">
+                <option value="Contado">Contado</option>
+                <option value="Cuotas">Cuotas</option>
+              </select>
+              <input name="fechaCompra" type="date" value={form.fechaCompra} onChange={handle}
+                className="input" />
+            </div>
+            {form.tipoPago === 'Contado' ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <input name="totalContado" type="number" min="0" step="0.01" placeholder="Total Contado ($)" value={form.totalContado} onChange={handle}
+                  className="input" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <input name="valorCuota" type="number" min="0" step="0.01" placeholder="Valor Cuota ($)" value={form.valorCuota} onChange={handle}
+                  className="input" />
+                <input name="cantidadCuotas" type="number" min="0" step="1" placeholder="Cantidad Cuotas" value={form.cantidadCuotas} onChange={handle}
+                  className="input" />
+              </div>
+            )}
+            {err && <p className="text-red-500 text-sm">{err}</p>}
+            <div className="flex gap-2">
+              <button type="submit" className="btn-primary">
+                {editId ? 'Guardar Cambios' : 'Agregar Material'}
+              </button>
+              {editId && (
+                <button type="button" onClick={cancelEdit}
+                  className="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-medium transition">
+                  Cancelar
+                </button>
+              )}
+            </div>
+          </form>
+
+          {materiales.length === 0 ? (
+            <div className="text-center py-10 text-gray-400 text-sm">No hay materiales registrados</div>
+          ) : (
+            <div className="overflow-x-auto rounded-xl border card-shadow">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
+                    <th className="text-left p-3">Material</th>
+                    <th className="text-left p-3 hidden sm:table-cell">Descripción</th>
+                    <th className="text-left p-3">Proveedor</th>
+                    <th className="text-right p-3">Cant.</th>
+                    <th className="text-center p-3 hidden sm:table-cell">Pago</th>
+                    <th className="text-right p-3">Total Gastado</th>
+                    <th className="text-right p-3 hidden md:table-cell">Saldo Cuotas</th>
+                    <th className="text-right p-3">Cuotas</th>
+                    <th className="text-center p-3">Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {materiales.map(m => (
+                    <tr key={m.id} className={`border-t hover:bg-gray-50/50 transition ${editId === m.id ? 'bg-blue-50/50' : ''}`}>
+                      <td className="p-3 font-medium">{m.material}</td>
+                      <td className="p-3 text-gray-500 text-xs hidden sm:table-cell max-w-[160px] truncate">{m.descripcion || '—'}</td>
+                      <td className="p-3 text-gray-500">{m.proveedor}</td>
+                      <td className="p-3 text-right tabular-nums">{m.cantidad}</td>
+                      <td className="p-3 text-center hidden sm:table-cell">
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${m.tipoPago === 'Contado' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
+                          {m.tipoPago}
+                        </span>
+                      </td>
+                      <td className="p-3 text-right font-medium tabular-nums text-gray-800">{fmt(totalGastado(m))}</td>
+                      <td className={`p-3 text-right tabular-nums hidden md:table-cell ${saldoCuotas(m) > 0 ? 'text-amber-600' : 'text-gray-400'}`}>
+                        {m.tipoPago === 'Cuotas' ? fmt(saldoCuotas(m)) : '—'}
+                      </td>
+                      <td className="p-3 text-right">
+                        {m.tipoPago === 'Cuotas' ? (
+                          <div className="flex flex-wrap gap-1 justify-end">
+                            {mesesCuota(m).map((mes, i) => (
+                              <span key={i}
+                                className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${mes.pagada ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-400'}`}
+                                title={mes.pagada ? 'Pagada' : 'Pendiente'}>
+                                {mes.nombre}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-gray-300">—</span>
+                        )}
+                      </td>
+                      <td className="p-3 text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <button onClick={() => startEdit(m)}
+                            className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition font-medium text-xs"
+                            title="Editar">&#9998;</button>
+                          <button onClick={() => remove(m.id)}
+                            className="w-7 h-7 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition"
+                            title="Eliminar">&times;</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ─── Mano de Obra ──────────────────────────────────────────
+    function ManoObra({ tareas, setTareas, adelantos }) {
+      const [form, setForm] = useState({
+        tarea: '', unidad: 'metro', cantidad: '', precioUnitario: '', presupuesto: '', estado: 'No Iniciado',
+      });
+      const [editId, setEditId] = useState(null);
+      const [err, setErr] = useState('');
+      const pptoManual = useRef(false);
+      const formRef = useRef(null);
+
+      const UNIDADES = ['metro', 'm²', 'm³', 'pieza', 'bolsa', 'litro', 'kg', 'unidad', 'global'];
+
+      const handle = (e) => {
+        const { name, value } = e.target;
+        const next = { ...form, [name]: value };
+        if (name === 'presupuesto') {
+          pptoManual.current = true;
+        } else if (!pptoManual.current && next.cantidad && next.precioUnitario) {
+          next.presupuesto = String(toNum(next.cantidad) * toNum(next.precioUnitario));
+        }
+        setForm(next);
+      };
+
+      const startEdit = (t) => {
+        setEditId(t.id);
+        pptoManual.current = false;
+        setForm({
+          tarea: t.tarea,
+          unidad: t.unidad || 'metro',
+          cantidad: String(t.cantidad || ''),
+          precioUnitario: String(t.precioUnitario || ''),
+          presupuesto: String(t.presupuesto),
+          estado: t.estado,
+        });
+        setErr('');
+        formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      };
+
+      const cancelEdit = () => {
+        setEditId(null);
+        pptoManual.current = false;
+        setForm({ tarea: '', unidad: 'metro', cantidad: '', precioUnitario: '', presupuesto: '', estado: 'No Iniciado' });
+        setErr('');
+      };
+
+      const submit = (e) => {
+        e.preventDefault();
+        setErr('');
+        if (!form.tarea.trim()) {
+          setErr('Completa el nombre de la tarea'); return;
+        }
+        const presup = pptoManual.current
+          ? toNum(form.presupuesto)
+          : (form.cantidad && form.precioUnitario)
+            ? toNum(form.cantidad) * toNum(form.precioUnitario)
+            : toNum(form.presupuesto);
+        const data = {
+          tarea: form.tarea.trim(),
+          unidad: form.unidad,
+          cantidad: toNum(form.cantidad || 0),
+          precioUnitario: toNum(form.precioUnitario || 0),
+          presupuesto: presup,
+          estado: form.estado,
+        };
+        if (editId) {
+          setTareas(tareas.map(t => t.id === editId ? { ...t, ...data } : t));
+          cancelEdit();
+        } else {
+          setTareas([{ id: uid(), ...data }, ...tareas]);
+          setForm({ tarea: '', unidad: 'metro', cantidad: '', precioUnitario: '', presupuesto: '', estado: 'No Iniciado' });
+        }
+        pptoManual.current = false;
+      };
+
+      const remove = (id) => setTareas(tareas.filter(t => t.id !== id));
+      const changeEstado = (id, estado) => setTareas(tareas.map(t => t.id === id ? { ...t, estado } : t));
+
+      const estadoColor = (e) => {
+        if (e === 'Terminado') return 'bg-emerald-100 text-emerald-700';
+        if (e === 'En Proceso') return 'bg-blue-100 text-blue-700';
+        return 'bg-gray-100 text-gray-500';
+      };
+
+      return (
+        <div className="fade-in space-y-4">
+          <form ref={formRef} onSubmit={submit} className={`bg-white rounded-xl p-4 md:p-5 border card-shadow space-y-3 ${editId ? 'ring-2 ring-blue-400' : ''}`}>
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-gray-700 text-sm md:text-base">
+                {editId ? 'Editando Tarea' : 'Registrar Tarea'}
+              </h3>
+              {editId && (
+                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full font-medium">
+                  ID: {editId}
+                </span>
+              )}
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <input name="tarea" placeholder="Ítem / Tarea (ej: Encadenado)" value={form.tarea} onChange={handle}
+                className="input col-span-2 sm:col-span-4" />
+              <select name="unidad" value={form.unidad} onChange={handle} className="input">
+                {UNIDADES.map(u => <option key={u} value={u}>{u}</option>)}
+              </select>
+              <input name="cantidad" type="number" min="0" step="0.01" placeholder="Cantidad" value={form.cantidad} onChange={handle}
+                className="input" />
+              <input name="precioUnitario" type="number" min="0" step="0.01" placeholder="$ Precio Unitario" value={form.precioUnitario} onChange={handle}
+                className="input" />
+              <input name="presupuesto" type="number" min="0" step="0.01" placeholder="Presupuesto ($)" value={form.presupuesto} onChange={handle}
+                className="input" />
+              <select name="estado" value={form.estado} onChange={handle} className="input">
+                {ESTADOS.map(e => <option key={e} value={e}>{e}</option>)}
+              </select>
+            </div>
+            {err && <p className="text-red-500 text-sm">{err}</p>}
+            <div className="flex gap-2">
+              <button type="submit" className="btn-primary">
+                {editId ? 'Guardar Cambios' : 'Agregar Tarea'}
+              </button>
+              {editId && (
+                <button type="button" onClick={cancelEdit}
+                  className="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-medium transition">
+                  Cancelar
+                </button>
+              )}
+            </div>
+          </form>
+
+          {tareas.length === 0 ? (
+            <div className="text-center py-10 text-gray-400 text-sm">No hay tareas registradas</div>
+          ) : (
+            <div>
+              <div className="flex justify-end mb-2">
+                <button
+                  onClick={() => {
+                    const enc = calcularEncadenado(tareas, adelantos);
+                    const totalPresupuesto = enc.encadenado.reduce((s, e) => s + e.presupuestoOrig, 0);
+                    const totalAds = enc.encadenado.reduce((s, e) => s + e.adsDirectos, 0);
+                    const totalSaldo = enc.encadenado.reduce((s, e) => s + e.saldo, 0);
+                    const totalExceso = enc.encadenado.reduce((s, e) => s + e.exceso, 0);
+                    const tabla = `
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Tarea</th>
+                            <th class="text-right">Presupuesto</th>
+                            <th class="text-right">Adelantos</th>
+                            <th class="text-right">Ppto Ajustado</th>
+                            <th class="text-right">Saldo</th>
+                            <th class="text-center">Estado</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          ${enc.encadenado.map(e => `
+                            <tr>
+                              <td>
+                                <div class="font-medium">${e.tarea}</div>
+                                ${e.cantidad && e.precioUnitario ? `<div class="text-xs text-gray-400">${e.cantidad} ${e.unidad || ''} x $${toNum(e.precioUnitario).toLocaleString('es-MX')}</div>` : ''}
+                              </td>
+                              <td class="text-right font-medium">${fmt(e.presupuestoOrig)}</td>
+                              <td class="text-right">
+                                <div>
+                                  ${e.adsDirectos > 0 ? `<div class="text-amber-600 font-medium">${fmt(e.adsDirectos)}</div>` : ''}
+                                  ${e.descuentoAntes > 0 ? `<div class="badge-purple">+${fmt(e.descuentoAntes)} excedente${e.sourceAntes ? ` de «${e.sourceAntes}»` : ''}</div>` : ''}
+                                  ${e.exceso > 0 ? `<div class="badge-rose">+${fmt(e.exceso)} excedente</div>` : ''}
+                                  ${e.adsDirectos === 0 && e.descuentoAntes === 0 ? '<span class="text-gray-400">—</span>' : ''}
+                                </div>
+                              </td>
+                              <td class="text-right font-medium">
+                                <div>${fmt(e.presupuestoAjustado)}</div>
+                                ${e.descuentoAntes > 0 ? `<div class="text-xs text-gray-500">(${fmt(e.presupuestoOrig)} - ${fmt(e.descuentoAntes)})</div>` : ''}
+                                ${e.exceso > 0 ? '<div class="text-xs text-gray-500">excedente → siguiente tarea</div>' : ''}
+                              </td>
+                              <td class="text-right font-medium">
+                                ${e.exceso > 0 ? '<div class="text-emerald-600">$0.00</div><div class="text-xs text-emerald-500">saldado</div>' : e.saldo === 0 ? '<div class="text-emerald-600">$0.00</div>' : `<div>${fmt(e.saldo)}</div>`}
+                              </td>
+                              <td class="text-center"><span class="badge-gray">${e.estado}</span></td>
+                            </tr>
+                          `).join('')}
+                        </tbody>
+                      </table>
+                      <div class="footer">
+                        <span>Presupuesto original: <strong>${fmt(totalPresupuesto)}</strong></span>
+                        <span>Adelantos: <strong class="text-amber-600">${fmt(totalAds)}</strong></span>
+                        <span>Saldo pendiente: <strong class="${totalSaldo === 0 ? 'text-emerald-600' : 'text-amber-600'}">${fmt(totalSaldo)}</strong></span>
+                        ${totalExceso > 0 ? `<span class="badge-rose">Excedente: ${fmt(totalExceso)} → se resta de la siguiente tarea</span>` : ''}
+                      </div>
+                    `;
+                    imprimirSeccion('Mano de Obra', tabla);
+                  }}
+                  className="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs font-medium transition flex items-center gap-1"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                  Imprimir
+                </button>
+              </div>
+              <div className="overflow-x-auto rounded-xl border card-shadow">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
+                    <th className="text-left p-3">Tarea</th>
+                    <th className="text-right p-3">Presupuesto</th>
+                    <th className="text-right p-3">Adelantos</th>
+                    <th className="text-right p-3 hidden sm:table-cell">Ppto Ajustado</th>
+                    <th className="text-right p-3">Saldo</th>
+                    <th className="text-center p-3">Estado</th>
+                    <th className="text-center p-3">Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(() => {
+                    const encData = calcularEncadenado(tareas, adelantos);
+                    return encData.encadenado.map(e => {
+                      const desc = e.cantidad && e.precioUnitario
+                        ? `${e.cantidad} ${e.unidad || ''} x $${toNum(e.precioUnitario).toLocaleString('es-MX')}`
+                        : '';
+                      const colorFila = e.descuentoAntes > 0
+                        ? 'bg-purple-50/40'
+                        : e.exceso > 0
+                          ? 'bg-rose-50/40'
+                          : '';
+                      return (
+                        <tr key={e.id} className={`border-t hover:bg-gray-50/50 transition ${editId === e.id ? 'bg-blue-50/50' : ''} ${colorFila}`}>
+                          <td className="p-3">
+                            <span className="font-medium">{e.tarea}</span>
+                            {desc && <span className="block text-[10px] text-gray-400 mt-0.5">{desc}</span>}
+                          </td>
+                          <td className="p-3 text-right font-medium tabular-nums text-gray-800">{fmt(e.presupuestoOrig)}</td>
+                          <td className="p-3 text-right tabular-nums">
+                            <div className="flex flex-col items-end">
+                              {e.adsDirectos > 0 && (
+                                <span className="text-amber-600 font-medium">{fmt(e.adsDirectos)}</span>
+                              )}
+                              {e.descuentoAntes > 0 && (
+                                <span className="text-[10px] font-bold text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded mt-0.5 border border-purple-200">
+                                  +{fmt(e.descuentoAntes)} excedente
+                                  {e.sourceAntes && <span className="font-normal text-purple-400"> de «{e.sourceAntes}»</span>}
+                                </span>
+                              )}
+                              {e.adsDirectos === 0 && e.descuentoAntes === 0 && (
+                                <span className="text-gray-400">—</span>
+                              )}
+                              {e.exceso > 0 && (
+                                <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded mt-0.5 border border-rose-200">
+                                  +{fmt(e.exceso)} excedente
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className={`p-3 text-right tabular-nums hidden sm:table-cell font-medium ${e.presupuestoAjustado !== e.presupuestoOrig ? 'text-indigo-600' : 'text-gray-500'}`}>
+                            <div className="flex flex-col items-end">
+                              <span>{fmt(e.presupuestoAjustado)}</span>
+                              {e.descuentoAntes > 0 && (
+                                <span className="text-[9px] text-purple-500 font-normal">
+                                  ({fmt(e.presupuestoOrig)} - {fmt(e.descuentoAntes)})
+                                </span>
+                              )}
+                              {e.exceso > 0 && (
+                                <span className="text-[9px] text-rose-500 font-normal">
+                                  excedente → siguiente tarea
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className={`p-3 text-right font-medium tabular-nums ${e.saldo === 0 ? 'text-emerald-600' : 'text-amber-600'}`}>
+                            {e.exceso > 0 ? (
+                              <div className="flex flex-col items-end">
+                                <span className="text-emerald-600">$0.00</span>
+                                <span className="text-[10px] text-emerald-500">saldado</span>
+                              </div>
+                            ) : e.saldo === 0 ? (
+                              <span className="text-emerald-600">$0.00</span>
+                            ) : (
+                              fmt(e.saldo)
+                            )}
+                          </td>
+                          <td className="p-3 text-center">
+                            <select value={e.estado} onChange={(e2) => changeEstado(e.id, e2.target.value)}
+                              className={`text-xs font-medium rounded-full px-2 py-1 border-0 cursor-pointer ${estadoColor(e.estado)}`}>
+                              {ESTADOS.map(est => <option key={est} value={est}>{est}</option>)}
+                            </select>
+                          </td>
+                          <td className="p-3 text-center">
+                            <div className="flex items-center justify-center gap-1">
+                              <button onClick={() => startEdit(tareas.find(t => t.id === e.id))}
+                                className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition font-medium text-xs"
+                                title="Editar">&#9998;</button>
+                              <button onClick={() => remove(e.id)}
+                                className="w-7 h-7 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition"
+                                title="Eliminar tarea">&times;</button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    });
+                  })()}
+                </tbody>
+              </table>
+              {(() => {
+                const encData = calcularEncadenado(tareas, adelantos);
+                const totalPresupuesto = encData.encadenado.reduce((s, e) => s + e.presupuestoOrig, 0);
+                const totalAjustado = encData.encadenado.reduce((s, e) => s + e.presupuestoAjustado, 0);
+                const totalAds = encData.encadenado.reduce((s, e) => s + e.adsDirectos, 0);
+                const totalSaldo = encData.encadenado.reduce((s, e) => s + e.saldo, 0);
+                const totalExceso = encData.encadenado.reduce((s, e) => s + e.exceso, 0);
+                return (
+                  <div className="border-t border-gray-100 bg-gray-50/50 px-3 py-2 text-xs text-gray-500 flex flex-wrap gap-x-4 gap-y-1">
+                    <span>Presupuesto original: <strong className="text-gray-700">{fmt(totalPresupuesto)}</strong></span>
+                    <span>Adelantos: <strong className="text-amber-700">{fmt(totalAds)}</strong></span>
+                    <span>Ppto ajustado: <strong className="text-indigo-700">{fmt(totalAjustado)}</strong></span>
+                    <span>Saldo pendiente: <strong className={totalSaldo === 0 ? 'text-emerald-600' : 'text-amber-600'}>{fmt(totalSaldo)}</strong></span>
+                    {totalExceso > 0 && (
+                      <span className="text-rose-600 font-semibold bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+                        Excedente: {fmt(totalExceso)} → se resta de la siguiente tarea
+                      </span>
+                    )}
+                    {encData.descuentoFinal > 0 && <span className="text-purple-600 font-medium">→ Desc. pendiente: {fmt(encData.descuentoFinal)}</span>}
+                  </div>
+                );
+              })()}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ─── Adelantos ──────────────────────────────────────────────
+    function Adelantos({ adelantos, setAdelantos, tareas }) {
+      const [form, setForm] = useState({ fecha: today(), tareaId: '', monto: '', metodo: 'Efectivo' });
+      const [editId, setEditId] = useState(null);
+      const [err, setErr] = useState('');
+      const [reciboPreview, setReciboPreview] = useState(null); // modal: { src, tipo }
+      const fileInputRef = useRef(null);
+      const formRef = useRef(null);
+
+      const handle = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+      const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+      const handleRecibo = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (file.size > MAX_FILE_SIZE) {
+          setErr('El archivo supera 5 MB. Intenta con uno más pequeño.');
+          e.target.value = '';
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          setForm(prev => ({ ...prev, recibo: ev.target.result, reciboNombre: file.name }));
+          setErr('');
+        };
+        reader.readAsDataURL(file);
+      };
+
+      const removeRecibo = () => {
+        setForm(prev => ({ ...prev, recibo: null, reciboNombre: null }));
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      };
+
+      const startEdit = (a) => {
+        setEditId(a.id);
+        setForm({
+          fecha: a.fecha || today(),
+          tareaId: String(a.tareaId),
+          monto: String(a.monto),
+          metodo: a.metodo,
+          recibo: a.recibo || null,
+          reciboNombre: a.reciboNombre || null,
+        });
+        setErr('');
+        formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      };
+
+      const cancelEdit = () => {
+        setEditId(null);
+        setForm({ fecha: today(), tareaId: '', monto: '', metodo: 'Efectivo', recibo: null, reciboNombre: null });
+        if (fileInputRef.current) fileInputRef.current.value = '';
+        setErr('');
+      };
+
+      const submit = (e) => {
+        e.preventDefault();
+        setErr('');
+        if (!form.tareaId || !form.monto || toNum(form.monto) <= 0) {
+          setErr('Selecciona una tarea e ingresa un monto válido'); return;
+        }
+        const data = {
+          fecha: form.fecha || today(),
+          tareaId: toNum(form.tareaId),
+          monto: toNum(form.monto),
+          metodo: form.metodo,
+          recibo: form.recibo || null,
+          reciboNombre: form.reciboNombre || null,
+        };
+        if (editId) {
+          setAdelantos(adelantos.map(a => a.id === editId ? { ...a, ...data } : a));
+          cancelEdit();
+        } else {
+          setAdelantos([{ id: uid(), ...data }, ...adelantos]);
+          setForm({ fecha: today(), tareaId: '', monto: '', metodo: 'Efectivo', recibo: null, reciboNombre: null });
+          if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+      };
+
+      const remove = (id) => setAdelantos(adelantos.filter(a => a.id !== id));
+
+      const tareaNombre = (id) => {
+        const t = tareas.find(t => t.id === id);
+        return t ? t.tarea : '—';
+      };
+
+      const totalAdelantos = adelantos.reduce((s, a) => s + toNum(a.monto), 0);
+
+      return (
+        <div className="fade-in space-y-4">
+          <form ref={formRef} onSubmit={submit} className={`bg-white rounded-xl p-4 md:p-5 border card-shadow space-y-3 ${editId ? 'ring-2 ring-blue-400' : ''}`}>
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-gray-700 text-sm md:text-base">
+                {editId ? 'Editando Adelanto' : 'Registrar Adelanto'}
+              </h3>
+              {editId && (
+                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full font-medium">
+                  ID: {editId}
+                </span>
+              )}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <input name="fecha" type="date" value={form.fecha} onChange={handle}
+                className="input" />
+              <select name="tareaId" value={form.tareaId} onChange={handle}
+                className="input">
+                <option value="">Seleccionar tarea...</option>
+                {tareas.map(t => <option key={t.id} value={t.id}>{t.tarea}</option>)}
+              </select>
+              <input name="monto" type="number" min="0" step="0.01" placeholder="Monto Entregado ($)" value={form.monto} onChange={handle}
+                className="input" />
+              <select name="metodo" value={form.metodo} onChange={handle}
+                className="input">
+                {METODOS.map(m => <option key={m} value={m}>{m}</option>)}
+              </select>
+            </div>
+            {/* Adjuntar recibo */}
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">Adjuntar recibo (imagen o PDF, máx. 5 MB)</label>
+              <div className="flex items-center gap-3 flex-wrap">
+                <label className="flex items-center gap-2 px-3 py-2 rounded-lg border border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 hover:border-blue-300 cursor-pointer transition text-sm text-gray-600">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+                  {form.reciboNombre || 'Seleccionar archivo...'}
+                  <input ref={fileInputRef} type="file" accept="image/*,.pdf" onChange={handleRecibo}
+                    className="hidden" />
+                </label>
+                {form.recibo && (
+                  <div className="flex items-center gap-2">
+                    {form.reciboNombre && form.reciboNombre.endsWith('.pdf') ? (
+                      <span className="inline-flex items-center gap-1 text-xs bg-red-50 text-red-600 px-2 py-1 rounded-full border border-red-200">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                        PDF adjunto
+                      </span>
+                    ) : (
+                      <img src={form.recibo} alt="Preview" className="w-10 h-10 rounded-lg object-cover border border-gray-200" />
+                    )}
+                    <button type="button" onClick={removeRecibo}
+                      className="text-red-400 hover:text-red-600 transition p-1"
+                      title="Quitar recibo">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+            {err && <p className="text-red-500 text-sm">{err}</p>}
+            <div className="flex gap-2">
+              <button type="submit" className="btn-primary">
+                {editId ? 'Guardar Cambios' : 'Registrar Adelanto'}
+              </button>
+              {editId && (
+                <button type="button" onClick={cancelEdit}
+                  className="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-medium transition">
+                  Cancelar
+                </button>
+              )}
+            </div>
+          </form>
+
+          {totalAdelantos > 0 && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between">
+              <span className="text-sm font-medium text-gray-600">Total adelantos entregados</span>
+              <span className="text-lg font-bold text-amber-700 tabular-nums">{fmt(totalAdelantos)}</span>
+            </div>
+          )}
+
+          {adelantos.length === 0 ? (
+            <div className="text-center py-10 text-gray-400 text-sm">No hay adelantos registrados</div>
+          ) : (
+            <div>
+              <div className="flex justify-end mb-2">
+                <button
+                  onClick={() => {
+                    const totalAdelantos = adelantos.reduce((s, a) => s + toNum(a.monto), 0);
+                    const enc = calcularEncadenado(tareas, adelantos);
+                    const tareaExceso = enc.encadenado.find(e => e.exceso > 0);
+                    const ordenados = [...adelantos].sort((a, b) => b.fecha.localeCompare(a.fecha));
+                    const lista = ordenados.map(a => {
+                      const t = tareas.find(t => t.id === a.tareaId);
+                      const tName = t ? t.tarea : '—';
+                      return `
+                        <div class="card-item">
+                          <div class="info">
+                            <div class="meta">
+                              <span>${a.fecha}</span>
+                              <span class="badge-gray">${a.metodo}</span>
+                            </div>
+                            <div class="name">${tName}</div>
+                          </div>
+                          <div class="amount text-right">${fmt(a.monto)}</div>
+                        </div>
+                      `;
+                    }).join('');
+                    const encadenadoHtml = (tareaExceso || enc.descuentoFinal > 0) ? `
+                      <div style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+                        <div style="font-weight: 600; color: #9333ea; font-size: 13px;">Encadenado activo</div>
+                        <div style="font-size: 12px; color: #7c3aed; margin-top: 4px;">
+                          ${tareaExceso ? `Los adelantos de <strong>"${tareaExceso.tarea}"</strong> exceden su presupuesto en <strong>${fmt(tareaExceso.exceso)}</strong>. Ese excedente descuenta del presupuesto de la siguiente tarea.` : ''}
+                          ${enc.descuentoFinal > 0 ? `<br>Queda un descuento pendiente de <strong>${fmt(enc.descuentoFinal)}</strong> para próximas tareas.` : ''}
+                        </div>
+                      </div>
+                    ` : '';
+                    const totalHtml = `
+                      <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 600; color: #92400e;">Total adelantos</span>
+                        <span style="font-size: 18px; font-weight: 700; color: #d97706;">${fmt(totalAdelantos)}</span>
+                      </div>
+                    `;
+                    imprimirSeccion('Adelantos', totalHtml + encadenadoHtml + lista);
+                  }}
+                  className="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs font-medium transition flex items-center gap-1"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                  Imprimir
+                </button>
+              </div>
+              <div className="space-y-2">
+              {[...adelantos].sort((a, b) => b.fecha.localeCompare(a.fecha)).map(a => {
+                const tName = tareaNombre(a.tareaId);
+                const isEditing = editId === a.id;
+                return (
+                  <div key={a.id}
+                    className={`bg-white rounded-xl p-4 border card-shadow flex items-center justify-between gap-3 slide-up ${isEditing ? 'ring-2 ring-blue-400 bg-blue-50/30' : ''}`}>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
+                        <span>{a.fecha}</span>
+                        <span className="w-1 h-1 rounded-full bg-gray-300" />
+                        <span className="bg-gray-100 px-2 py-0.5 rounded">{a.metodo}</span>
+                        {a.recibo && (
+                          <button onClick={() => setReciboPreview({ src: a.recibo, tipo: a.reciboNombre?.endsWith('.pdf') ? 'pdf' : 'img' })}
+                            className="inline-flex items-center gap-1 bg-green-50 text-green-600 px-2 py-0.5 rounded-full border border-green-200 hover:bg-green-100 transition cursor-pointer"
+                            title="Ver recibo adjunto">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+                            Recibo
+                          </button>
+                        )}
+                      </div>
+                      <p className="font-medium text-sm truncate">{tName}</p>
+                      <p className="text-lg font-bold text-gray-800 tabular-nums">{fmt(a.monto)}</p>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button onClick={() => startEdit(a)}
+                        className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition flex items-center justify-center font-medium text-xs"
+                        title="Editar">&#9998;</button>
+                      <button onClick={() => remove(a.id)}
+                        className="w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition flex items-center justify-center"
+                        title="Eliminar adelanto">&times;</button>
+                    </div>
+                  </div>
+                );
+              })}
+              </div>
+            </div>
+          )}
+
+          {/* Modal vista previa de recibo */}
+          {reciboPreview && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm fade-in"
+              onClick={() => setReciboPreview(null)}>
+              <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-[92vw] max-h-[85vh] flex flex-col overflow-hidden slide-up"
+                style={{background:'var(--surface)'}}
+                onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                  <span className="text-sm font-semibold text-gray-700">Recibo adjunto</span>
+                  <button onClick={() => setReciboPreview(null)}
+                    className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition text-gray-500">
+                    &times;
+                  </button>
+                </div>
+                <div className="flex-1 overflow-auto p-2 flex items-center justify-center bg-gray-50">
+                  {reciboPreview.tipo === 'pdf' ? (
+                    <iframe src={reciboPreview.src} className="w-full h-[70vh] rounded-lg border border-gray-200" title="Recibo PDF" />
+                  ) : (
+                    <img src={reciboPreview.src} alt="Recibo" className="max-w-full max-h-[70vh] rounded-lg object-contain" />
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ─── Configuracion ──────────────────────────────────────────
+    function Configuracion({ config, setConfig }) {
+      const [form, setForm] = useState({ ...config });
+      const [guardado, setGuardado] = useState(false);
+      const [mostrarToken, setMostrarToken] = useState(false);
+
+      const handle = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+      const guardar = (e) => {
+        e.preventDefault();
+        setConfig({ ...form });
+        setGuardado(true);
+        setTimeout(() => setGuardado(false), 2000);
+      };
+
+      return (
+        <div className="fade-in space-y-4 max-w-2xl">
+          <form onSubmit={guardar} className="bg-white rounded-xl p-4 md:p-5 border card-shadow space-y-4">
+            <h3 className="font-semibold text-gray-700 text-sm md:text-base">
+              Configuracion de Mercado Pago
+            </h3>
+            <p className="text-xs text-gray-400">
+              Ingresa las credenciales de tu cuenta de Mercado Pago para recibir pagos.
+            </p>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Nombre del negocio / Empresa</label>
+                <input name="nombreNegocio" placeholder="Ej: Constructora Martinez" value={form.nombreNegocio || ''} onChange={handle}
+                  className="input" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Public Key (clave publica)</label>
+                <input name="publicKey" placeholder="APP_USB-xxxx-xxxx-xxxx-xxxx" value={form.publicKey || ''} onChange={handle}
+                  className="input font-mono text-xs" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Access Token</label>
+                <div className="relative">
+                  <input name="accessToken" type={mostrarToken ? 'text' : 'password'} placeholder="APP_USB-xxxxxxxxxx" value={form.accessToken || ''} onChange={handle}
+                    className="input font-mono text-xs pr-10" />
+                  <button type="button" onClick={() => setMostrarToken(!mostrarToken)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm">
+                    {mostrarToken ? 'Ocultar' : 'Mostrar'}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button type="submit" className="btn-primary">
+                Guardar Configuracion
+              </button>
+              {guardado && (
+                <span className="text-emerald-600 text-sm font-medium animate-pulse">
+                  Configuracion guardada
+                </span>
+              )}
+            </div>
+          </form>
+
+          {(config.publicKey || config.accessToken) && (
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+              <p className="text-sm font-medium text-emerald-700">Mercado Pago configurado</p>
+              <p className="text-xs text-emerald-600 mt-1">
+                Las credenciales estan guardadas. La app usara estas credenciales para procesar pagos.
+              </p>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ─── Tabs ──────────────────────────────────────────────────
+    const TABS = [
+      { key: 'tablero', label: 'Tablero' },
+      { key: 'materiales', label: 'Materiales' },
+      { key: 'mano-obra', label: 'Mano de Obra' },
+      { key: 'adelantos', label: 'Adelantos' },
+      { key: 'configuracion', label: 'Configuracion' },
+    ];
+
+    // ─── App ────────────────────────────────────────────────────
+    function App() {
+      const [tab, setTab] = useState('tablero');
+      const [materiales, setMateriales] = usePersist('obra-materiales', []);
+      const [tareas, setTareas] = usePersist('obra-tareas', []);
+      const [adelantos, setAdelantos] = usePersist('obra-adelantos', []);
+      const [config, setConfig] = usePersist('obra-config', { nombreNegocio: '', publicKey: '', accessToken: '' });
+      const [theme, setTheme] = usePersist('obra-theme', 'light');
+      const fileRef = useRef(null);
+
+      useEffect(() => {
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+      }, [theme]);
+
+      const exportData = () => {
+        const data = { materiales, tareas, adelantos, config };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `backup-obra-${today()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+
+      const importData = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          try {
+            const data = JSON.parse(ev.target.result);
+            if (data.materiales) setMateriales(data.materiales);
+            if (data.tareas) setTareas(data.tareas);
+            if (data.adelantos) setAdelantos(data.adelantos);
+            if (data.config) setConfig(data.config);
+            alert('Datos importados correctamente');
+          } catch {
+            alert('Error: el archivo no es valido');
+          }
+        };
+        reader.readAsText(file);
+        e.target.value = '';
+      };
+
+      const badge = (key) => {
+        if (key === 'materiales') return materiales.length || null;
+        if (key === 'mano-obra') return tareas.length || null;
+        if (key === 'adelantos') return adelantos.length || null;
+        if (key === 'configuracion' && (config.publicKey || config.accessToken)) return '*';
+        return null;
+      };
+
+      return (
+        <div className="max-w-5xl mx-auto px-3 sm:px-4 py-4 md:py-6 pb-8">
+          {/* Header */}
+          <header className="mb-4 md:mb-6">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h1 className="text-lg md:text-2xl font-bold tracking-tight" style={{color:'var(--text)'}}>
+                  {config.nombreNegocio || 'Control Financiero de Obra'}
+                </h1>
+                <p className="text-xs md:text-sm mt-0.5" style={{color:'var(--text4)'}}>Gestion de gastos y pagos de {config.nombreNegocio ? config.nombreNegocio.toLowerCase() : 'construccion'}</p>
+              </div>
+              <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition text-lg"
+                style={{background:'var(--surface2)', color:'var(--text3)', border:'1px solid var(--border)'}}
+                title={theme === 'light' ? 'Modo oscuro' : 'Modo claro'}>
+                {theme === 'light' ? '🌙' : '☀️'}
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-3">
+              <button onClick={exportData} className="btn-secondary">Descargar Backup</button>
+              <button onClick={() => fileRef.current.click()} className="btn-secondary">Restaurar Backup</button>
+              <input ref={fileRef} type="file" accept=".json" onChange={importData} className="hidden" />
+            </div>
+          </header>
+
+          {/* Tab Nav */}
+          <nav className="flex gap-1 p-1 rounded-xl mb-4 md:mb-6 overflow-x-auto" role="tablist" style={{background:'var(--surface2)'}}>
+            {TABS.map(t => {
+              const active = tab === t.key;
+              const b = badge(t.key);
+              return (
+                <button
+                  key={t.key}
+                  onClick={() => setTab(t.key)}
+                  role="tab"
+                  aria-selected={active}
+                  className={`relative flex items-center gap-1.5 px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium whitespace-nowrap transition-all duration-200
+                    ${active ? 'tab-active' : ''}`}
+                  style={active
+                    ? { background:'var(--surface)', color:'#2563eb' }
+                    : { color:'var(--text3)' }}
+                >
+                  {t.label}
+                  {b !== null && (
+                    <span className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full
+                      ${active ? 'bg-blue-100 text-blue-700' : 'bg-gray-200 text-gray-500'}`}>
+                      {b}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Content */}
+          {tab === 'tablero' && <Tablero materiales={materiales} tareas={tareas} adelantos={adelantos} />}
+          {tab === 'materiales' && <Materiales materiales={materiales} setMateriales={setMateriales} />}
+          {tab === 'mano-obra' && <ManoObra tareas={tareas} setTareas={setTareas} adelantos={adelantos} />}
+          {tab === 'adelantos' && <Adelantos adelantos={adelantos} setAdelantos={setAdelantos} tareas={tareas} />}
+          {tab === 'configuracion' && <Configuracion config={config} setConfig={setConfig} />}
+        </div>
+      );
+    }
+
+    // ─── Styles ────────────────────────────────────────────────
+    const style = document.createElement('style');
+    style.textContent = `
+      .input {
+        width: 100%;
+        padding: 0.625rem 0.75rem;
+        border: 1px solid var(--border2);
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        color: var(--text);
+        background: var(--surface);
+        transition: border-color 0.15s, box-shadow 0.15s, background 0.2s, color 0.2s;
+        outline: none;
+      }
+      .input:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+      }
+      .input::placeholder { color: var(--text4); }
+      .btn-primary {
+        padding: 0.625rem 1.25rem;
+        background: #2563eb;
+        color: #fff;
+        font-size: 0.875rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: background 0.15s, transform 0.1s;
+      }
+      .btn-primary:hover { background: #1d4ed8; }
+      .btn-primary:active { transform: scale(0.97); }
+      .btn-secondary {
+        padding: 0.5rem 1rem;
+        background: var(--surface);
+        color: var(--text2);
+        font-size: 0.875rem;
+        font-weight: 500;
+        border: 1px solid var(--border2);
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s, color 0.2s;
+      }
+      .btn-secondary:hover { background: var(--surface2); border-color: var(--text4); }
+      .hidden { display: none; }
+      @media (max-width: 640px) {
+        .input { font-size: 16px; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // ─── Render ────────────────────────────────────────────────
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>

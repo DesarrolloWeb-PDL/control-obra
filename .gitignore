@@ -1,0 +1,9 @@
+﻿# Datos locales del usuario - no subir al repo
+backup-obra-*.json
+comprobantes/*
+!comprobantes/.gitkeep
+*.pdf
+
+# OS
+.DS_Store
+Thumbs.db

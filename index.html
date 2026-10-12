@@ -25,63 +25,68 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     :root {
-      --bg: #f9fafb; --surface: #ffffff; --surface2: #f3f4f6;
-      --text: #111827; --text2: #374151; --text3: #6b7280; --text4: #9ca3af;
-      --border: #e5e7eb; --border2: #d1d5db;
+      --bg: #fafafa; --surface: #ffffff; --surface2: #f5f5f5;
+      --text: #171717; --text2: #404040; --text3: #737373; --text4: #a3a3a3;
+      --border: #e5e5e5; --border2: #d4d4d4;
+      --accent: #e85d04; --accent-hover: #d45203;
     }
     .dark {
-      --bg: #0f172a; --surface: #1e293b; --surface2: #334155;
-      --text: #f1f5f9; --text2: #cbd5e1; --text3: #94a3b8; --text4: #64748b;
-      --border: #334155; --border2: #475569;
+      --bg: #0a0a0a; --surface: #141414; --surface2: #1f1f1f;
+      --text: #ededed; --text2: #d4d4d4; --text3: #a1a1aa; --text4: #71717a;
+      --border: #262626; --border2: #404040;
+      --accent: #e85d04; --accent-hover: #ff7b1a;
     }
     * { box-sizing: border-box; }
-    body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; background: var(--bg); color: var(--text); transition: background 0.2s, color 0.2s; }
+    body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; background: var(--bg); color: var(--text); transition: background 0.2s, color 0.2s; letter-spacing: -0.01em; }
     input, select, button, textarea { font-family: inherit; }
+    ::selection { background: var(--accent); color: #fff; }
     .card-shadow { box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); }
-    .dark .card-shadow { box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2); }
+    .dark .card-shadow { box-shadow: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3); }
     .card-shadow-hover:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-    .tab-active { box-shadow: 0 2px 8px rgba(37,99,235,0.15); }
+    .tab-active { box-shadow: 0 2px 8px rgba(232,93,4,0.15); }
     .fade-in { animation: fadeIn 0.2s ease; }
     @keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
     .slide-up { animation: slideUp 0.25s ease; }
     @keyframes slideUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
     ::-webkit-scrollbar { height: 4px; width: 4px; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-      .dark ::-webkit-scrollbar-thumb { background: #475569; }
-      /* Dark mode card overrides */
-      .dark .bg-blue-50 { background: rgba(30,58,138,0.25) !important; border-color: rgba(59,130,246,0.3) !important; }
-      .dark .bg-indigo-50 { background: rgba(49,46,129,0.25) !important; border-color: rgba(99,102,241,0.3) !important; }
-      .dark .bg-gray-100 { background: var(--surface2) !important; border-color: var(--border) !important; }
-      .dark .bg-emerald-50 { background: rgba(6,95,70,0.25) !important; border-color: rgba(16,185,129,0.3) !important; }
-      .dark .bg-amber-50 { background: rgba(120,53,15,0.25) !important; border-color: rgba(245,158,11,0.3) !important; }
-      .dark .bg-rose-50 { background: rgba(136,19,55,0.25) !important; border-color: rgba(244,63,94,0.3) !important; }
-      .dark .bg-purple-50 { background: rgba(88,28,135,0.25) !important; border-color: rgba(168,85,247,0.3) !important; }
-      .dark .bg-red-50 { background: rgba(127,29,29,0.25) !important; border-color: rgba(239,68,68,0.3) !important; }
-      .dark .bg-green-50 { background: rgba(20,83,45,0.25) !important; border-color: rgba(34,197,94,0.3) !important; }
-      .dark .bg-blue-50\/50 { background: rgba(30,58,138,0.15) !important; }
-      .dark .bg-blue-50\/30 { background: rgba(30,58,138,0.1) !important; }
-      .dark .bg-gray-50\/50 { background: rgba(51,65,85,0.3) !important; }
-      .dark .bg-gray-50\/40 { background: rgba(51,65,85,0.2) !important; }
-      .dark .bg-purple-50\/40 { background: rgba(88,28,135,0.15) !important; }
-      .dark .bg-rose-50\/40 { background: rgba(136,19,55,0.15) !important; }
-      /* Dark mode text overrides */
-      .dark .text-gray-900 { color: var(--text) !important; }
-      .dark .text-gray-800 { color: var(--text) !important; }
-      .dark .text-gray-700 { color: var(--text2) !important; }
-      .dark .text-gray-600 { color: var(--text2) !important; }
-      .dark .text-gray-500 { color: var(--text3) !important; }
-      .dark .text-gray-400 { color: var(--text4) !important; }
-      .dark .text-gray-300 { color: var(--text4) !important; }
-      .dark .bg-gray-50 { background: var(--surface2) !important; }
-      .dark .bg-gray-100 { background: var(--surface2) !important; border-color: var(--border) !important; }
-      .dark .border-gray-100 { border-color: var(--border) !important; }
-      .dark .border-gray-200 { border-color: var(--border) !important; }
-      .dark .border-gray-300 { border-color: var(--border2) !important; }
-      .dark .border-t { border-color: var(--border) !important; }
-      .dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]) { border-color: var(--border) !important; }
-      .dark .ring-blue-400 { --tw-ring-color: rgba(96,165,250,0.5) !important; }
-      /* Dark mode surface overrides */
-      .dark .bg-white { background: var(--surface) !important; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+    /* Dark mode card overrides */
+    .dark .bg-blue-50 { background: rgba(232,93,4,0.08) !important; border-color: rgba(232,93,4,0.2) !important; }
+    .dark .bg-indigo-50 { background: rgba(232,93,4,0.06) !important; border-color: rgba(232,93,4,0.15) !important; }
+    .dark .bg-gray-100 { background: var(--surface2) !important; border-color: var(--border) !important; }
+    .dark .bg-emerald-50 { background: rgba(16,185,129,0.1) !important; border-color: rgba(16,185,129,0.2) !important; }
+    .dark .bg-amber-50 { background: rgba(245,158,11,0.1) !important; border-color: rgba(245,158,11,0.2) !important; }
+    .dark .bg-rose-50 { background: rgba(244,63,94,0.1) !important; border-color: rgba(244,63,94,0.2) !important; }
+    .dark .bg-purple-50 { background: rgba(168,85,247,0.1) !important; border-color: rgba(168,85,247,0.2) !important; }
+    .dark .bg-red-50 { background: rgba(239,68,68,0.1) !important; border-color: rgba(239,68,68,0.2) !important; }
+    .dark .bg-green-50 { background: rgba(34,197,94,0.1) !important; border-color: rgba(34,197,94,0.2) !important; }
+    .dark .bg-blue-50\/50 { background: rgba(232,93,4,0.06) !important; }
+    .dark .bg-blue-50\/30 { background: rgba(232,93,4,0.04) !important; }
+    .dark .bg-gray-50\/50 { background: rgba(40,40,40,0.5) !important; }
+    .dark .bg-gray-50\/40 { background: rgba(40,40,40,0.4) !important; }
+    .dark .bg-purple-50\/40 { background: rgba(168,85,247,0.08) !important; }
+    .dark .bg-rose-50\/40 { background: rgba(244,63,94,0.08) !important; }
+    /* Dark mode text overrides */
+    .dark .text-gray-900 { color: var(--text) !important; }
+    .dark .text-gray-800 { color: var(--text) !important; }
+    .dark .text-gray-700 { color: var(--text2) !important; }
+    .dark .text-gray-600 { color: var(--text2) !important; }
+    .dark .text-gray-500 { color: var(--text3) !important; }
+    .dark .text-gray-400 { color: var(--text4) !important; }
+    .dark .text-gray-300 { color: var(--text4) !important; }
+    .dark .bg-gray-50 { background: var(--surface2) !important; }
+    .dark .bg-gray-100 { background: var(--surface2) !important; border-color: var(--border) !important; }
+    .dark .border-gray-100 { border-color: var(--border) !important; }
+    .dark .border-gray-200 { border-color: var(--border) !important; }
+    .dark .border-gray-300 { border-color: var(--border2) !important; }
+    .dark .border-t { border-color: var(--border) !important; }
+    .dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]) { border-color: var(--border) !important; }
+    .dark .ring-blue-400 { --tw-ring-color: rgba(232,93,4,0.4) !important; }
+    /* Dark mode surface overrides */
+    .dark .bg-white { background: var(--surface) !important; }
+    /* Alert overlay */
+    .alert-overlay { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); padding: 1rem; }
+    .alert-box { max-width: 400px; width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
       /* Watermark de cubos en el body */
       body::before {
         content: '';
@@ -90,7 +95,7 @@
         z-index: 0;
         pointer-events: none;
         opacity: 0.03;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='4' width='11' height='11' rx='2' fill='%232563eb'/%3E%3Crect x='17' y='4' width='11' height='11' rx='2' fill='%232563eb' opacity='0.7'/%3E%3Crect x='4' y='17' width='11' height='11' rx='2' fill='%232563eb' opacity='0.5'/%3E%3Crect x='17' y='17' width='11' height='11' rx='2' fill='%232563eb' opacity='0.3'/%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='4' width='11' height='11' rx='2' fill='%23e85d04'/%3E%3Crect x='17' y='4' width='11' height='11' rx='2' fill='%23e85d04' opacity='0.7'/%3E%3Crect x='4' y='17' width='11' height='11' rx='2' fill='%23e85d04' opacity='0.5'/%3E%3Crect x='17' y='17' width='11' height='11' rx='2' fill='%23e85d04' opacity='0.3'/%3E%3C/svg%3E");
         background-size: 120px 120px;
         background-repeat: repeat;
       }
@@ -338,7 +343,7 @@
       const saldoMateriales = Math.max(0, totalMateriales - pagadoMateriales);
 
       const cards = [
-        { label: 'Total Invertido en Materiales', value: totalMateriales, color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200' },
+        { label: 'Total Invertido en Materiales', value: totalMateriales, color: 'text-amber-700', bg: 'bg-amber-50 border-amber-200' },
         { label: 'Total Contratado Mano de Obra', value: totalManoObra, color: 'text-indigo-700', bg: 'bg-indigo-50 border-indigo-200' },
         { label: 'Presupuesto Total Comprometido', value: totalComprometido, color: 'text-gray-900', bg: 'bg-gray-100 border-gray-300' },
         { label: 'Total Ya Pagado', value: totalPagado, color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
@@ -496,13 +501,13 @@
 
       return (
         <div className="fade-in space-y-4">
-          <form ref={formRef} onSubmit={submit} className={`bg-white rounded-xl p-4 md:p-5 border card-shadow space-y-3 ${editId ? 'ring-2 ring-blue-400' : ''}`}>
+          <form ref={formRef} onSubmit={submit} className={`bg-white rounded-xl p-4 md:p-5 border card-shadow space-y-3 ${editId ? 'ring-2 ring-amber-400' : ''}`}>
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-gray-700 text-sm md:text-base">
                 {editId ? 'Editando Material' : 'Registrar Material'}
               </h3>
               {editId && (
-                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full font-medium">
+                <span className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-full font-medium">
                   ID: {editId}
                 </span>
               )}
@@ -571,13 +576,13 @@
                 </thead>
                 <tbody>
                   {materiales.map(m => (
-                    <tr key={m.id} className={`border-t hover:bg-gray-50/50 transition ${editId === m.id ? 'bg-blue-50/50' : ''}`}>
+                    <tr key={m.id} className={`border-t hover:bg-gray-50/50 transition ${editId === m.id ? 'bg-amber-50/50' : ''}`}>
                       <td className="p-3 font-medium">{m.material}</td>
                       <td className="p-3 text-gray-500 text-xs hidden sm:table-cell max-w-[160px] truncate">{m.descripcion || '—'}</td>
                       <td className="p-3 text-gray-500">{m.proveedor}</td>
                       <td className="p-3 text-right tabular-nums">{m.cantidad}</td>
                       <td className="p-3 text-center hidden sm:table-cell">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${m.tipoPago === 'Contado' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${m.tipoPago === 'Contado' ? 'bg-amber-100 text-amber-700' : 'bg-purple-100 text-purple-700'}`}>
                           {m.tipoPago}
                         </span>
                       </td>
@@ -603,7 +608,7 @@
                       <td className="p-3 text-center">
                         <div className="flex items-center justify-center gap-1">
                           <button onClick={() => startEdit(m)}
-                            className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition font-medium text-xs"
+                            className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 transition font-medium text-xs"
                             title="Editar">&#9998;</button>
                           <button onClick={() => remove(m.id)}
                             className="w-7 h-7 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition"
@@ -699,19 +704,19 @@
 
       const estadoColor = (e) => {
         if (e === 'Terminado') return 'bg-emerald-100 text-emerald-700';
-        if (e === 'En Proceso') return 'bg-blue-100 text-blue-700';
+        if (e === 'En Proceso') return 'bg-amber-100 text-amber-700';
         return 'bg-gray-100 text-gray-500';
       };
 
       return (
         <div className="fade-in space-y-4">
-          <form ref={formRef} onSubmit={submit} className={`bg-white rounded-xl p-4 md:p-5 border card-shadow space-y-3 ${editId ? 'ring-2 ring-blue-400' : ''}`}>
+          <form ref={formRef} onSubmit={submit} className={`bg-white rounded-xl p-4 md:p-5 border card-shadow space-y-3 ${editId ? 'ring-2 ring-amber-400' : ''}`}>
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-gray-700 text-sm md:text-base">
                 {editId ? 'Editando Tarea' : 'Registrar Tarea'}
               </h3>
               {editId && (
-                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full font-medium">
+                <span className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-full font-medium">
                   ID: {editId}
                 </span>
               )}
@@ -840,7 +845,7 @@
                           ? 'bg-rose-50/40'
                           : '';
                       return (
-                        <tr key={e.id} className={`border-t hover:bg-gray-50/50 transition ${editId === e.id ? 'bg-blue-50/50' : ''} ${colorFila}`}>
+                        <tr key={e.id} className={`border-t hover:bg-gray-50/50 transition ${editId === e.id ? 'bg-amber-50/50' : ''} ${colorFila}`}>
                           <td className="p-3">
                             <span className="font-medium">{e.tarea}</span>
                             {desc && <span className="block text-[10px] text-gray-400 mt-0.5">{desc}</span>}
@@ -903,7 +908,7 @@
                           <td className="p-3 text-center">
                             <div className="flex items-center justify-center gap-1">
                               <button onClick={() => startEdit(tareas.find(t => t.id === e.id))}
-                                className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition font-medium text-xs"
+                                className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 transition font-medium text-xs"
                                 title="Editar">&#9998;</button>
                               <button onClick={() => remove(e.id)}
                                 className="w-7 h-7 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition"
@@ -1035,13 +1040,13 @@
 
       return (
         <div className="fade-in space-y-4">
-          <form ref={formRef} onSubmit={submit} className={`bg-white rounded-xl p-4 md:p-5 border card-shadow space-y-3 ${editId ? 'ring-2 ring-blue-400' : ''}`}>
+          <form ref={formRef} onSubmit={submit} className={`bg-white rounded-xl p-4 md:p-5 border card-shadow space-y-3 ${editId ? 'ring-2 ring-amber-400' : ''}`}>
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-gray-700 text-sm md:text-base">
                 {editId ? 'Editando Adelanto' : 'Registrar Adelanto'}
               </h3>
               {editId && (
-                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full font-medium">
+                <span className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-full font-medium">
                   ID: {editId}
                 </span>
               )}
@@ -1065,7 +1070,7 @@
             <div>
               <label className="block text-xs font-medium text-gray-500 mb-1.5">Adjuntar recibo (imagen o PDF, máx. 5 MB)</label>
               <div className="flex items-center gap-3 flex-wrap">
-                <label className="flex items-center gap-2 px-3 py-2 rounded-lg border border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 hover:border-blue-300 cursor-pointer transition text-sm text-gray-600">
+                <label className="flex items-center gap-2 px-3 py-2 rounded-lg border border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 hover:border-amber-300 cursor-pointer transition text-sm text-gray-600">
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
                   {form.reciboNombre || 'Seleccionar archivo...'}
                   <input ref={fileInputRef} type="file" accept="image/*,.pdf" onChange={handleRecibo}
@@ -1167,7 +1172,7 @@
                 const isEditing = editId === a.id;
                 return (
                   <div key={a.id}
-                    className={`bg-white rounded-xl p-4 border card-shadow flex items-center justify-between gap-3 slide-up ${isEditing ? 'ring-2 ring-blue-400 bg-blue-50/30' : ''}`}>
+                    className={`bg-white rounded-xl p-4 border card-shadow flex items-center justify-between gap-3 slide-up ${isEditing ? 'ring-2 ring-amber-400 bg-amber-50/30' : ''}`}>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
                         <span>{a.fecha}</span>
@@ -1187,7 +1192,7 @@
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
                       <button onClick={() => startEdit(a)}
-                        className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition flex items-center justify-center font-medium text-xs"
+                        className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 transition flex items-center justify-center font-medium text-xs"
                         title="Editar">&#9998;</button>
                       <button onClick={() => remove(a.id)}
                         className="w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition flex items-center justify-center"
@@ -1328,7 +1333,7 @@
       return (
         <div className="landing-overlay" id="landing">
           <div className="landing-card landing-fade">
-            <div className="flex justify-center mb-5" style={{color:'#2563eb'}}>
+            <div className="flex justify-center mb-5" style={{color:'#e85d04'}}>
               <CuboLogo size={56}/>
             </div>
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-1" style={{color:'var(--text)'}}>
@@ -1372,12 +1377,15 @@
       const [config, setConfig] = usePersist('obra-config', { nombreNegocio: '', publicKey: '', accessToken: '' });
       const [theme, setTheme] = usePersist('obra-theme', 'light');
       const [showLanding, setShowLanding] = useState(() => !localStorage.getItem('obra-landing-seen'));
+      const [importAlert, setImportAlert] = useState(null); // { data, fileName }
       const fileRef = useRef(null);
 
       const enterApp = () => {
         localStorage.setItem('obra-landing-seen', '1');
         setShowLanding(false);
       };
+
+      const hasData = materiales.length > 0 || tareas.length > 0 || adelantos.length > 0;
 
       useEffect(() => {
         document.documentElement.classList.toggle('dark', theme === 'dark');
@@ -1401,17 +1409,27 @@
         reader.onload = (ev) => {
           try {
             const data = JSON.parse(ev.target.result);
-            if (data.materiales) setMateriales(data.materiales);
-            if (data.tareas) setTareas(data.tareas);
-            if (data.adelantos) setAdelantos(data.adelantos);
-            if (data.config) setConfig(data.config);
-            alert('Datos importados correctamente');
+            if (!data.materiales && !data.tareas && !data.adelantos && !data.config) {
+              alert('Error: el archivo no contiene datos válidos');
+              return;
+            }
+            setImportAlert({ data, fileName: file.name });
           } catch {
-            alert('Error: el archivo no es valido');
+            alert('Error: el archivo no es un backup válido');
           }
         };
         reader.readAsText(file);
         e.target.value = '';
+      };
+
+      const confirmImport = () => {
+        if (!importAlert) return;
+        const { data } = importAlert;
+        if (data.materiales) setMateriales(data.materiales);
+        if (data.tareas) setTareas(data.tareas);
+        if (data.adelantos) setAdelantos(data.adelantos);
+        if (data.config) setConfig(data.config);
+        setImportAlert(null);
       };
 
       const badge = (key) => {
@@ -1425,6 +1443,37 @@
       return (
         <>
           {showLanding && <Landing onEnter={enterApp} />}
+          {importAlert && (
+            <div className="alert-overlay" onClick={() => setImportAlert(null)}>
+              <div className="alert-box" onClick={e => e.stopPropagation()}>
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-2xl">⚠️</span>
+                  <h3 className="text-base font-bold" style={{color:'var(--text)'}}>Reemplazar datos actuales</h3>
+                </div>
+                <p className="text-sm mb-2" style={{color:'var(--text2)'}}>
+                  Vas a importar <strong>"{importAlert.fileName}"</strong>.
+                </p>
+                {hasData ? (
+                  <div className="rounded-lg p-3 mb-4 text-xs leading-relaxed" style={{background:'rgba(239,68,68,0.08)', border:'1px solid rgba(239,68,68,0.2)', color:'var(--text2)'}}>
+                    <strong style={{color:'#ef4444'}}>Atención:</strong> tenés datos cargados actualmente
+                    ({materiales.length} materiales, {tareas.length} tareas, {adelantos.length} adelantos).
+                    Importar este backup <strong>reemplazará todos los datos actuales</strong> y no se puede deshacer.
+                  </div>
+                ) : (
+                  <p className="text-xs mb-4" style={{color:'var(--text3)'}}>
+                    No tenés datos cargados actualmente. El backup se importará sin conflicto.
+                  </p>
+                )}
+                <p className="text-xs mb-4" style={{color:'var(--text4)'}}>
+                  💡 Consejo: descargá un backup de tus datos actuales antes de importar, por si querés volver atrás.
+                </p>
+                <div className="flex gap-2 justify-end">
+                  <button onClick={() => setImportAlert(null)} className="btn-secondary">Cancelar</button>
+                  <button onClick={confirmImport} className="btn-primary">Sí, importar</button>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="relative z-10 max-w-5xl mx-auto px-3 sm:px-4 py-4 md:py-6 pb-8">
           {/* Header */}
           <header className="mb-4 md:mb-6">
@@ -1447,6 +1496,9 @@
               <button onClick={() => fileRef.current.click()} className="btn-secondary">Restaurar Backup</button>
               <input ref={fileRef} type="file" accept=".json" onChange={importData} className="hidden" />
             </div>
+            <p className="text-xs mt-2 leading-relaxed" style={{color:'var(--text4)'}}>
+              💾 Tus datos se guardan en este navegador. Descargá un backup regularmente para no perderlos si limpiás el navegador o cambiás de dispositivo.
+            </p>
           </header>
 
           {/* Tab Nav */}
@@ -1463,13 +1515,13 @@
                   className={`relative flex items-center gap-1.5 px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium whitespace-nowrap transition-all duration-200
                     ${active ? 'tab-active' : ''}`}
                   style={active
-                    ? { background:'var(--surface)', color:'#2563eb' }
+                    ? { background:'var(--surface)', color:'#e85d04' }
                     : { color:'var(--text3)' }}
                 >
                   {t.label}
                   {b !== null && (
                     <span className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full
-                      ${active ? 'bg-blue-100 text-blue-700' : 'bg-gray-200 text-gray-500'}`}>
+                      ${active ? 'bg-amber-100 text-amber-700' : 'bg-gray-200 text-gray-500'}`}>
                       {b}
                     </span>
                   )}
@@ -1488,7 +1540,7 @@
           {/* Footer */}
           <footer className="app-footer">
             <div className="flex flex-col items-center gap-2">
-              <div style={{color:'#2563eb'}}>
+              <div style={{color:'#e85d04'}}>
                 <CuboLogo size={24}/>
               </div>
               <p className="text-xs font-semibold" style={{color:'var(--text3)'}}>
@@ -1523,13 +1575,13 @@
         outline: none;
       }
       .input:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(232,93,4,0.12);
       }
       .input::placeholder { color: var(--text4); }
       .btn-primary {
         padding: 0.625rem 1.25rem;
-        background: #2563eb;
+        background: var(--accent);
         color: #fff;
         font-size: 0.875rem;
         font-weight: 600;
@@ -1538,7 +1590,7 @@
         cursor: pointer;
         transition: background 0.15s, transform 0.1s;
       }
-      .btn-primary:hover { background: #1d4ed8; }
+      .btn-primary:hover { background: var(--accent-hover); }
       .btn-primary:active { transform: scale(0.97); }
       .btn-secondary {
         padding: 0.5rem 1rem;

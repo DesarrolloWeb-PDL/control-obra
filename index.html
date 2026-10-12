@@ -1402,12 +1402,11 @@
       const [adelantos, setAdelantos] = usePersist('obra-adelantos', []);
       const [config, setConfig] = usePersist('obra-config', { nombreNegocio: '', publicKey: '', accessToken: '' });
       const [theme, setTheme] = usePersist('obra-theme', 'light');
-      const [showLanding, setShowLanding] = useState(() => !localStorage.getItem('obra-landing-seen'));
+      const [showLanding, setShowLanding] = useState(true);
       const [importAlert, setImportAlert] = useState(null); // { data, fileName }
       const fileRef = useRef(null);
 
       const enterApp = () => {
-        localStorage.setItem('obra-landing-seen', '1');
         setShowLanding(false);
       };
 
